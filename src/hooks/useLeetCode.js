@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react';
 import { LEETCODE_USERNAME, LEETCODE_API } from '../config';
 
 function todayString() {
-  return new Date().toISOString().split('T')[0];
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
 function unixToDateString(ts) {
-  return new Date(Number(ts) * 1000).toISOString().split('T')[0];
+  const d = new Date(Number(ts) * 1000);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
 export function useLeetCode() {
