@@ -8,6 +8,7 @@ function todayString() {
 
 export function useGitHub() {
   const [committedToday, setCommittedToday] = useState(false);
+  const [rawEvents, setRawEvents] = useState([]);
   const [calendarData, setCalendarData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -28,6 +29,7 @@ export function useGitHub() {
         const pushEvents = events.filter((e) => e.type === 'PushEvent');
 
         setCommittedToday(pushEvents.some((e) => e.created_at.startsWith(today)));
+        setRawEvents(pushEvents);
 
         const countsByDate = {};
         for (const e of pushEvents) {
@@ -47,5 +49,5 @@ export function useGitHub() {
     fetchData();
   }, []);
 
-  return { committedToday, calendarData, loading, error };
+  return { committedToday, rawEvents, calendarData, loading, error };
 }

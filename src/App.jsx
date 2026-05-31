@@ -1,12 +1,19 @@
+import { useState } from 'react';
 import { useLeetCode } from './hooks/useLeetCode';
 import { useGitHub } from './hooks/useGitHub';
 import StatusCard from './components/StatusCard';
 import ActivityHeatmap from './components/ActivityHeatmap';
+import DayDetailSidebar from './components/DayDetailSidebar';
 import { LEETCODE_USERNAME, GITHUB_USERNAME } from './config';
 
 export default function App() {
   const leetcode = useLeetCode();
   const github = useGitHub();
+  const [selectedDate, setSelectedDate] = useState(null);
+
+  function handleDayClick(date) {
+    setSelectedDate((prev) => (prev === date ? null : date));
+  }
 
   return (
     <div
@@ -16,6 +23,8 @@ export default function App() {
         color: '#f1f5f9',
         fontFamily: "'Inter', 'Segoe UI', sans-serif",
         padding: '40px 24px',
+        paddingRight: selectedDate ? '380px' : '24px',
+        transition: 'padding-right 0.2s ease',
       }}
     >
       <div style={{ maxWidth: '900px', margin: '0 auto' }}>
@@ -49,14 +58,27 @@ export default function App() {
           <ActivityHeatmap
             title="LeetCode Submissions — Last 365 Days"
             values={leetcode.calendarData}
+            onDayClick={handleDayClick}
+            selectedDate={selectedDate}
           />
           <ActivityHeatmap
             title="GitHub Commits — Last 30 Days"
             values={github.calendarData}
             note="(GitHub public API limited to ~30 days)"
+            onDayClick={handleDayClick}
+            selectedDate={selectedDate}
           />
         </div>
       </div>
+
+      {selectedDate && (
+        <DayDetailSidebar
+          date={selectedDate}
+          submissions={leetcode.rawSubmissions}
+          events={github.rawEvents}
+          onClose={() => setSelectedDate(null)}
+        />
+      )}
     </div>
   );
 }

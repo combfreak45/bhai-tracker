@@ -76,7 +76,7 @@ function getMonthLabels(weeks) {
 const CELL = 13;
 const GAP = 3;
 
-export default function ActivityHeatmap({ title, values, note, numDays = 365 }) {
+export default function ActivityHeatmap({ title, values, note, numDays = 365, onDayClick, selectedDate }) {
   const weeks = buildGrid(values, numDays);
   const monthLabels = getMonthLabels(weeks);
   const gridWidth = weeks.length * (CELL + GAP);
@@ -127,6 +127,7 @@ export default function ActivityHeatmap({ title, values, note, numDays = 365 }) 
                     cell ? (
                       <div
                         key={cell.date}
+                        onClick={() => onDayClick?.(cell.date)}
                         data-tooltip-id="heatmap-tip"
                         data-tooltip-content={`${cell.date}: ${cell.count} submission${cell.count === 1 ? '' : 's'}`}
                         style={{
@@ -134,7 +135,9 @@ export default function ActivityHeatmap({ title, values, note, numDays = 365 }) 
                           height: CELL,
                           borderRadius: 3,
                           background: cellColor(cell.count, cell.isFuture),
-                          cursor: cell.count > 0 ? 'pointer' : 'default',
+                          cursor: 'pointer',
+                          outline: cell.date === selectedDate ? '2px solid #f1f5f9' : 'none',
+                          outlineOffset: '1px',
                         }}
                       />
                     ) : (

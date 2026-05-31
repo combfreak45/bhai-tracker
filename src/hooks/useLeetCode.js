@@ -13,6 +13,7 @@ function unixToDateString(ts) {
 
 export function useLeetCode() {
   const [solvedToday, setSolvedToday] = useState(false);
+  const [rawSubmissions, setRawSubmissions] = useState([]);
   const [calendarData, setCalendarData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -39,6 +40,7 @@ export function useLeetCode() {
             unixToDateString(s.timestamp) === today
         );
         setSolvedToday(solved);
+        setRawSubmissions(submissions);
 
         const rawCalendar =
           typeof calData.submissionCalendar === 'string'
@@ -60,5 +62,5 @@ export function useLeetCode() {
     fetchData();
   }, []);
 
-  return { solvedToday, calendarData, loading, error };
+  return { solvedToday, rawSubmissions, calendarData, loading, error };
 }
