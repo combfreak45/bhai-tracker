@@ -37,11 +37,15 @@ export function useLeetCode() {
     const today = todayString();
 
     async function fetchData() {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 10000);
+
       try {
         const [subRes, calRes] = await Promise.all([
-          fetch(`${LEETCODE_API}/${LEETCODE_USERNAME}/submission?limit=20`),
-          fetch(`${LEETCODE_API}/${LEETCODE_USERNAME}/calendar`),
+          fetch(`${LEETCODE_API}/${LEETCODE_USERNAME}/submission?limit=20`, { signal: controller.signal }),
+          fetch(`${LEETCODE_API}/${LEETCODE_USERNAME}/calendar`, { signal: controller.signal }),
         ]);
+        clearTimeout(timeout);
 
         if (subRes.status === 429 || calRes.status === 429)
           throw new Error('LeetCode API rate limit exceeded, try again later');
@@ -66,7 +70,14 @@ export function useLeetCode() {
         setRawSubmissions(submissions);
         setCalendarData(parseCalendar(calData.submissionCalendar));
       } catch (err) {
-        setError(err.message);
+        clearTimeout(timeout);
+        if (err.name === 'AbortError') {
+          setError('Request timed out — check your internet connection');
+        } else if (!navigator.onLine) {
+          setError('No internet connection');
+        } else {
+          setError(err.message);
+        }
       } finally {
         setLoading(false);
       }

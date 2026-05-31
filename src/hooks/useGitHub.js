@@ -17,10 +17,15 @@ export function useGitHub() {
     const today = todayString();
 
     async function fetchData() {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 10000);
+
       try {
         const res = await fetch(
-          `https://api.github.com/users/${GITHUB_USERNAME}/events/public?per_page=100`
+          `https://api.github.com/users/${GITHUB_USERNAME}/events/public?per_page=100`,
+          { signal: controller.signal }
         );
+        clearTimeout(timeout);
 
         if (res.status === 429 || res.status === 403) {
           const resetAt = res.headers.get('X-RateLimit-Reset');
@@ -52,7 +57,14 @@ export function useGitHub() {
 
         setCalendarData(Object.entries(countsByDate).map(([date, count]) => ({ date, count })));
       } catch (err) {
-        setError(err.message);
+        clearTimeout(timeout);
+        if (err.name === 'AbortError') {
+          setError('Request timed out — check your internet connection');
+        } else if (!navigator.onLine) {
+          setError('No internet connection');
+        } else {
+          setError(err.message);
+        }
       } finally {
         setLoading(false);
       }
