@@ -73,8 +73,8 @@ function getMonthLabels(weeks) {
   return labels;
 }
 
-const CELL = 13;
-const GAP = 3;
+const CELL = 18;
+const GAP = 4;
 
 export default function ActivityHeatmap({ title, values, note, numDays = 365, onDayClick, selectedDate }) {
   const weeks = buildGrid(values, numDays);

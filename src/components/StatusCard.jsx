@@ -1,4 +1,4 @@
-export default function StatusCard({ platform, username, done, loading, error }) {
+export default function StatusCard({ platform, username, done, loading, error, expanded, onToggle }) {
   const isLeetCode = platform === 'leetcode';
 
   const icon = isLeetCode ? (
@@ -17,9 +17,10 @@ export default function StatusCard({ platform, username, done, loading, error })
 
   return (
     <div
+      onClick={onToggle}
       style={{
         background: bgColor,
-        border: `2px solid ${done ? '#22c55e' : error ? '#ef4444' : '#374151'}`,
+        border: `2px solid ${expanded ? accentColor : done ? '#22c55e' : error ? '#ef4444' : '#374151'}`,
         borderRadius: '16px',
         padding: '28px 32px',
         minWidth: '280px',
@@ -27,13 +28,19 @@ export default function StatusCard({ platform, username, done, loading, error })
         display: 'flex',
         flexDirection: 'column',
         gap: '12px',
+        cursor: 'pointer',
+        userSelect: 'none',
+        transition: 'border-color 0.15s ease',
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
         {icon}
-        <div>
+        <div style={{ flex: 1 }}>
           <div style={{ color: accentColor, fontWeight: 700, fontSize: '1.1rem' }}>{label}</div>
           <div style={{ color: '#9ca3af', fontSize: '0.8rem' }}>@{username}</div>
+        </div>
+        <div style={{ color: '#475569', fontSize: '0.8rem' }}>
+          {expanded ? '▲' : '▼'}
         </div>
       </div>
 
@@ -42,20 +49,10 @@ export default function StatusCard({ platform, username, done, loading, error })
       ) : error ? (
         <div style={{ color: '#ef4444', fontSize: '0.9rem' }}>⚠ {error}</div>
       ) : (
-        <div
-          style={{
-            fontSize: '1.4rem',
-            fontWeight: 700,
-            color: done ? '#22c55e' : '#f87171',
-          }}
-        >
+        <div style={{ fontSize: '1.4rem', fontWeight: 700, color: done ? '#22c55e' : '#f87171' }}>
           {done
-            ? isLeetCode
-              ? '✅ Solved today!'
-              : '✅ Committed today!'
-            : isLeetCode
-            ? '❌ No solve yet...'
-            : '❌ No commit yet...'}
+            ? isLeetCode ? '✅ Solved today!' : '✅ Committed today!'
+            : isLeetCode ? '❌ No solve yet...' : '❌ No commit yet...'}
         </div>
       )}
     </div>

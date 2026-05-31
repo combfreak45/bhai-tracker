@@ -10,6 +10,12 @@ export default function App() {
   const leetcode = useLeetCode();
   const github = useGitHub();
   const [selectedDate, setSelectedDate] = useState(null);
+  const [expanded, setExpanded] = useState(null); // 'leetcode' | 'github' | null
+
+  function handleToggle(platform) {
+    setExpanded((prev) => (prev === platform ? null : platform));
+    setSelectedDate(null);
+  }
 
   function handleDayClick(date) {
     setSelectedDate((prev) => (prev === date ? null : date));
@@ -44,6 +50,8 @@ export default function App() {
             done={leetcode.solvedToday}
             loading={leetcode.loading}
             error={leetcode.error}
+            expanded={expanded === 'leetcode'}
+            onToggle={() => handleToggle('leetcode')}
           />
           <StatusCard
             platform="github"
@@ -51,23 +59,29 @@ export default function App() {
             done={github.committedToday}
             loading={github.loading}
             error={github.error}
+            expanded={expanded === 'github'}
+            onToggle={() => handleToggle('github')}
           />
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <ActivityHeatmap
-            title="LeetCode Submissions — Last 365 Days"
-            values={leetcode.calendarData}
-            onDayClick={handleDayClick}
-            selectedDate={selectedDate}
-          />
-          <ActivityHeatmap
-            title="GitHub Commits — Last 30 Days"
-            values={github.calendarData}
-            note="(GitHub public API limited to ~30 days)"
-            onDayClick={handleDayClick}
-            selectedDate={selectedDate}
-          />
+          {expanded === 'leetcode' && (
+            <ActivityHeatmap
+              title="LeetCode Submissions — Last 365 Days"
+              values={leetcode.calendarData}
+              onDayClick={handleDayClick}
+              selectedDate={selectedDate}
+            />
+          )}
+          {expanded === 'github' && (
+            <ActivityHeatmap
+              title="GitHub Commits — Last 30 Days"
+              values={github.calendarData}
+              numDays={30}
+              onDayClick={handleDayClick}
+              selectedDate={selectedDate}
+            />
+          )}
         </div>
       </div>
 
